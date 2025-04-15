@@ -117,7 +117,7 @@ class CustomMappingTransformer(BaseEstimator, TransformerMixin):
         """
         assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected Dataframe but got {type(X)} instead.'
         assert self.mapping_column in X.columns.to_list(), f'{self.__class__.__name__}.transform unknown column "{self.mapping_column}"'  #column legit?
-        warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
+       # warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
 
         #now check to see if all keys are contained in column
         column_set: Set[Any] = set(X[self.mapping_column].unique())
@@ -170,7 +170,7 @@ class CustomOHETransformer(BaseEstimator, TransformerMixin):
   def transform(self, X: pd.DataFrame) -> pd.DataFrame:
     assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected Dataframe but got {type(X)} instead.'
     assert self.target_column in X.columns.to_list(), f'{self.__class__.__name__}.transform unknown column {self.target_column}'
-    warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
+    #warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
     X_ = X.copy()
     X_ = pd.get_dummies(X_, columns=[self.target_column], dtype=int)
     return X_
@@ -255,7 +255,7 @@ class CustomDropColumnsTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected Dataframe but got {type(X)} instead.'
         assert set(self.column_list) - set(X.columns.to_list()) == set(), f'CustomDropColumnsTransformer.transform unknown columns to keep: {set(self.column_list) - set(X.columns.to_list())}'
-        warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
+        #warnings.filterwarnings('ignore', message='.*downcasting.*')  #squash warning in replace method below
         X_ = X.copy()
         if self.action == 'drop':
             X_.drop(columns=self.column_list, inplace=True)
