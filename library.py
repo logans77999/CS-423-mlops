@@ -289,3 +289,51 @@ customer_transformer = Pipeline(steps=[
     ('isp_ohe', CustomOHETransformer('ISP')),
     ], verbose=True)
 
+
+class CustomSigma3Transformer(BaseEstimator, TransformerMixin):
+    """
+    A transformer that applies 3-sigma clipping to a specified column in a pandas DataFrame.
+
+    This transformer follows the scikit-learn transformer interface and can be used in
+    a scikit-learn pipeline. It clips values in the target column to be within three standard
+    deviations from the mean.
+
+    Parameters
+    ----------
+    target_column : Hashable
+        The name of the column to apply 3-sigma clipping on.
+
+    Attributes
+    ----------
+    high_wall : Optional[float]
+        The upper bound for clipping, computed as mean + 3 * standard deviation.
+    low_wall : Optional[float]
+        The lower bound for clipping, computed as mean - 3 * standard deviation.
+    """
+
+    def __init__(self, target_column: str):
+      self.target_column = target_column
+      self.high_wall = None
+      self.low_wall = None
+
+    def fit(self, df: pd.DataFrame, y=None):
+      assert isinstance(df, pd.core.frame.DataFrame), f'expected Dataframe but got {type(df)} instead.'
+      assert self.target_column in df.columns.to_list(), f'unknown column {self.target_column}'
+
+      mean = df[self.target_column].mean()
+      std = df[self.target_column].std()
+      self.high_wall = mean + 3 * std
+      self.low_wall = mean - 3 * std
+
+      return self
+
+    def transform(self, df: pd.DataFrame, y=None):
+      assert isinstance(df, pd.core.frame.DataFrame), f'expected Dataframe but got {type(df)} instead.'
+      assert self.high_wall is not None and self.low_wall is not None, 'Sigma3Transformer.fit has not been called.'
+      assert self.target_column in df.columns.to_list(), f'unknown column {self.target_column}'
+
+      df = df.copy()
+      df[self.target_column] = df[self.target_column].clip(lower=self.low_wall, upper=self.high_wall)
+      df = df.reset_index(drop=True)
+      return df
+
