@@ -275,23 +275,6 @@ class CustomDropColumnsTransformer(BaseEstimator, TransformerMixin):
         result: pd.DataFrame = self.transform(X)
         return result
 
-titanic_transformer = Pipeline(steps=[
-    ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
-    ('class', CustomMappingTransformer('Class', {'Crew': 0, 'C3': 1, 'C2': 2, 'C1': 3})),
-    ('joined', CustomOHETransformer('Joined')),
-    ('fare', CustomTukeyTransformer(target_column='Fare', fence='outer')),
-    ], verbose=True)
-
-customer_transformer = Pipeline(steps=[
-    ('drop', CustomDropColumnsTransformer(['ID'], 'drop')),
-    ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
-    ('experience', CustomMappingTransformer('Experience Level', {'low': 0, 'medium': 1, 'high': 2})),
-    ('os_ohe', CustomOHETransformer('OS')),
-    ('isp_ohe', CustomOHETransformer('ISP')),
-    ('time spent', CustomTukeyTransformer('Time Spent', 'inner')),
-    ], verbose=True)
-
-
 class CustomSigma3Transformer(BaseEstimator, TransformerMixin):
     """
     A transformer that applies 3-sigma clipping to a specified column in a pandas DataFrame.
@@ -414,3 +397,19 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
         df = df.reset_index(drop=True)
           
       return df
+
+titanic_transformer = Pipeline(steps=[
+    ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
+    ('class', CustomMappingTransformer('Class', {'Crew': 0, 'C3': 1, 'C2': 2, 'C1': 3})),
+    ('joined', CustomOHETransformer('Joined')),
+    ('fare', CustomTukeyTransformer(target_column='Fare', fence='outer')),
+    ], verbose=True)
+
+customer_transformer = Pipeline(steps=[
+    ('drop', CustomDropColumnsTransformer(['ID'], 'drop')),
+    ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
+    ('experience', CustomMappingTransformer('Experience Level', {'low': 0, 'medium': 1, 'high': 2})),
+    ('os_ohe', CustomOHETransformer('OS')),
+    ('isp_ohe', CustomOHETransformer('ISP')),
+    ('time spent', CustomTukeyTransformer('Time Spent', 'inner')),
+    ], verbose=True)
