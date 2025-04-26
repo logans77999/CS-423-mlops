@@ -398,6 +398,51 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
           
       return df
 
+class CustomRobustTransformer(BaseEstimator, TransformerMixin):
+  """Applies robust scaling to a specified column in a pandas DataFrame.
+    This transformer calculates the interquartile range (IQR) and median
+    during the `fit` method and then uses these values to scale the
+    target column in the `transform` method.
+
+    Parameters
+    ----------
+    column : str
+        The name of the column to be scaled.
+
+    Attributes
+    ----------
+    target_column : str
+        The name of the column to be scaled.
+    iqr : float
+        The interquartile range of the target column.
+    med : float
+        The median of the target column.
+  """
+
+  def __init__(self, column):
+    self.column = column
+    self.iqr = None
+    self.med = None
+
+  def fit(self, X, y=None):
+    assert self.column in X.columns, f"{self.column} not in {X.columns}"
+    assert X[self.column].dtype != 'bool', f"{self.column} is binary"
+    col = X[self.column]
+    self.iqr = col.quantile(0.75) - col.quantile(0.25)
+    self.med = col.median()
+    return self
+
+  def transform(self, X):
+    X_transformed = X.copy()
+    col = X_transformed[self.column]
+    X_transformed[self.column] = (col - self.med) / self.iqr
+    return X_transformed
+
+  def fit_transform(self, X, y=None):
+    self.fit(X)
+    return self.transform(X)
+
+
 titanic_transformer = Pipeline(steps=[
     ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
     ('class', CustomMappingTransformer('Class', {'Crew': 0, 'C3': 1, 'C2': 2, 'C1': 3})),
@@ -406,10 +451,12 @@ titanic_transformer = Pipeline(steps=[
     ], verbose=True)
 
 customer_transformer = Pipeline(steps=[
-    ('drop', CustomDropColumnsTransformer(['ID'], 'drop')),
     ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
     ('experience', CustomMappingTransformer('Experience Level', {'low': 0, 'medium': 1, 'high': 2})),
-    ('os_ohe', CustomOHETransformer('OS')),
+    ('os_ohe', CustomMappingTransformer('OS', {'Android' : 0, 'iOS' : 1})),
     ('isp_ohe', CustomOHETransformer('ISP')),
-    ('time spent', CustomTukeyTransformer('Time Spent', 'inner')),
+    ('tukey_age', CustomTukeyTransformer('Age', 'inner')),
+    ('tukey_time spent', CustomTukeyTransformer('Time Spent', 'inner')),
+    ('robust_age', CustomRobustTransformer('Age')),
+    ('robust_time spent', CustomRobustTransformer('Time Spent')),
     ], verbose=True)
