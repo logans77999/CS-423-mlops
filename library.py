@@ -412,4 +412,5 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
       elif self.fence == 'outer':
         df[self.target_column] = df[self.target_column].clip(lower=self.outer_low, upper=self.outer_high)
         df = df.reset_index(drop=True)
+          
       return df
