@@ -442,6 +442,42 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
     self.fit(X)
     return self.transform(X)
 
+class CustomKNNTransformer(BaseEstimator, TransformerMixin):
+  """Imputes missing values using KNN.
+
+  This transformer wraps the KNNImputer from scikit-learn and hard-codes
+  add_indicator to be False. It also ensures that the input and output
+  are pandas DataFrames.
+
+  Parameters
+  ----------
+  n_neighbors : int, default=5
+      Number of neighboring samples to use for imputation.
+  weights : {'uniform', 'distance'}, default='uniform'
+      Weight function used in prediction. Possible values:
+      "uniform" : uniform weights. All points in each neighborhood
+      are weighted equally.
+      "distance" : weight points by the inverse of their distance.
+      in this case, closer neighbors of a query point will have a
+      greater influence than neighbors which are further away.
+  """
+  #your code below
+
+  def __init__(self, n_neighbors=5, weights='uniform'):
+    self.n_neighbors = n_neighbors
+    self.weights = weights
+    self.knn_imputer = KNNImputer(n_neighbors=n_neighbors, weights=weights, add_indicator=False)
+
+  def fit(self, X, y=None):
+    self.knn_imputer.fit(X)
+    return self
+
+  def transform(self, X):
+    return pd.DataFrame(self.knn_imputer.transform(X), columns=X.columns)
+
+  def fit_transform(self, X, y=None):
+    return self.fit(X).transform(X)
+
 
 titanic_transformer = Pipeline(steps=[
     ('gender', CustomMappingTransformer('Gender', {'Male': 0, 'Female': 1})),
