@@ -398,8 +398,10 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
           
       return df
 
+from sklearn.exceptions import NotFittedError # import the missing exception
+
 class CustomRobustTransformer(BaseEstimator, TransformerMixin):
-  """Applies robust scaling to a specified column in a pandas DataFrame.
+    """Applies robust scaling to a specified column in a pandas DataFrame.
     This transformer calculates the interquartile range (IQR) and median
     during the `fit` method and then uses these values to scale the
     target column in the `transform` method.
@@ -417,30 +419,38 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
         The interquartile range of the target column.
     med : float
         The median of the target column.
-  """
+    """
 
-  def __init__(self, column):
-    self.column = column
-    self.iqr = None
-    self.med = None
+    def __init__(self, column):
+        self.column = column
+        self.iqr = None
+        self.med = None
 
-  def fit(self, X, y=None):
-    assert self.column in X.columns, f"{self.column} not in {X.columns}"
-    assert X[self.column].dtype != 'bool', f"{self.column} is binary"
-    col = X[self.column]
-    self.iqr = col.quantile(0.75) - col.quantile(0.25)
-    self.med = col.median()
-    return self
+    def fit(self, X, y=None):
+        assert self.column in X.columns, f"{self.column} not in {X.columns}"
+        assert X[self.column].dtype != 'bool', f"{self.column} is binary"
+        col = X[self.column]
+        # Calculate iqr and med using only non-missing values
+        self.iqr = col.dropna().quantile(0.75) - col.dropna().quantile(0.25)
+        self.med = col.dropna().median()
+        return self
 
-  def transform(self, X):
-    X_transformed = X.copy()
-    col = X_transformed[self.column]
-    X_transformed[self.column] = (col - self.med) / self.iqr
-    return X_transformed
+    def transform(self, X):
+        # Check if the transformer has been fitted
+        if self.iqr is None or self.med is None:
+            raise NotFittedError(f"This {self.__class__.__name__} instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.")
+        
+        X_transformed = X.copy()
+        col = X_transformed[self.column]
+        
+        # Check if iqr is not 0 to avoid division by zero errors
+        if self.iqr != 0:
+            X_transformed[self.column] = (col - self.med) / self.iqr
+        return X_transformed
 
-  def fit_transform(self, X, y=None):
-    self.fit(X)
-    return self.transform(X)
+    def fit_transform(self, X, y=None):
+        self.fit(X)
+        return self.transform(X)
 
 class CustomKNNTransformer(BaseEstimator, TransformerMixin):
   """Imputes missing values using KNN.
