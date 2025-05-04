@@ -10,6 +10,8 @@ from sklearn.preprocessing import FunctionTransformer
 import sklearn
 sklearn.set_config(transform_output="pandas")  #says pass pandas tables through pipeline instead of numpy matrices
 
+titanic_variance_based_split = 107   #add to your library
+customer_variance_based_split = 113  #add to your library
 
 class CustomMappingTransformer(BaseEstimator, TransformerMixin):
     """
