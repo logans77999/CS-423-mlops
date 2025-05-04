@@ -426,17 +426,20 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, target_column):
-        self.column = target_column
+        self.target_column = target_column
         self.iqr = None
         self.med = None
 
     def fit(self, X, y=None):
-        assert self.column in X.columns, f"{self.column} not in {X.columns}"
-        assert X[self.column].dtype != 'bool', f"{self.column} is binary"
-        col = X[self.column]
-        # Calculate iqr and med using only non-missing values
+        # Ensure the target column exists in the DataFrame
+        assert self.target_column in X.columns, f"{self.target_column} not in {X.columns}"
+        assert X[self.target_column].dtype != 'bool', f"{self.target_column} is binary"
+
+        col = X[self.target_column]
+        # Calculate IQR and median using non-missing values
         self.iqr = col.dropna().quantile(0.75) - col.dropna().quantile(0.25)
         self.med = col.dropna().median()
+
         return self
 
     def transform(self, X):
@@ -445,16 +448,17 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
             raise NotFittedError(f"This {self.__class__.__name__} instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.")
         
         X_transformed = X.copy()
-        col = X_transformed[self.column]
+        col = X_transformed[self.target_column]
         
-        # Check if iqr is not 0 to avoid division by zero errors
+        # Avoid division by zero if IQR is zero
         if self.iqr != 0:
-            X_transformed[self.column] = (col - self.med) / self.iqr
+            X_transformed[self.target_column] = (col - self.med) / self.iqr
         return X_transformed
 
     def fit_transform(self, X, y=None):
         self.fit(X)
         return self.transform(X)
+
 
 class CustomKNNTransformer(BaseEstimator, TransformerMixin):
   """Imputes missing values using KNN.
