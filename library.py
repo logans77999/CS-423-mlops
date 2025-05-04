@@ -669,7 +669,6 @@ titanic_transformer = Pipeline(steps=[
     ('passthrough', FunctionTransformer(validate=False)),  #does nothing but does remove warning
     ], verbose=True)
 
-    ('passthrough', FunctionTransformer(validate=False)),  #does nothing but does remove warning
 customer_transformer = Pipeline(steps=[
     ('map_os', CustomMappingTransformer('OS', {'Android': 0, 'iOS': 1})),
     ('target_isp', CustomTargetTransformer(col='ISP')),
