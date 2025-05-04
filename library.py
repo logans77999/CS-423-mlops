@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional, Union, List, Set, Hashable, Literal, Tup
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.impute import KNNImputer
+from sklearn.preprocessing import FunctionTransformer
 import sklearn
 sklearn.set_config(transform_output="pandas")  #says pass pandas tables through pipeline instead of numpy matrices
 
@@ -498,6 +499,7 @@ titanic_transformer = Pipeline(steps=[
     ('age_tukey', CustomTukeyTransformer(target_column='Age', fence='inner')),  # you might need this too!
     ('fare_robust', CustomRobustTransformer('Fare')),
     ('age_robust', CustomRobustTransformer('Age')),
+    ('passthrough', FunctionTransformer(validate=False)),  #does nothing but does remove warning
 ], verbose=True)
 
 customer_transformer = Pipeline(steps=[
@@ -509,4 +511,5 @@ customer_transformer = Pipeline(steps=[
     ('tukey_time spent', CustomTukeyTransformer('Time Spent', 'inner')),
     ('robust_age', CustomRobustTransformer('Age')),
     ('robust_time spent', CustomRobustTransformer('Time Spent')),
+    ('passthrough', FunctionTransformer(validate=False)),  #does nothing but does remove warning
     ], verbose=True)
