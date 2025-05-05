@@ -8,6 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import KNNImputer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import FunctionTransformer
+from sklearn.metrics import f1_score  #typical metric used to measure goodness of a model
 import sklearn
 sklearn.set_config(transform_output="pandas")  #says pass pandas tables through pipeline instead of numpy matrices
 
