@@ -754,13 +754,13 @@ def sort_grid(grid):
 
   return sorted_grid
 
-def halving_search(model, grid, x_train, y_train, factor=2, min_resources="exhaust", scoring='roc_auc'):
+def halving_search(model, grid, x_train, y_train, factor=3, min_resources="exhaust", scoring='roc_auc'):
   #your code below
   halving_cv = HalvingGridSearchCV(
       model, grid,  #our model and the parameter combos we want to try
       scoring=scoring,  #from chapter
       n_jobs=-1,  #use all available cpus
-      factor=3,  #double samples and take top half of combos on each iteration
+      factor=factor,  #double samples and take top half of combos on each iteration
       cv=5, random_state=1234,
       refit=True,  #remembers the best combo and gives us back that model already trained and ready for
   )
