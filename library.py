@@ -14,6 +14,8 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import ParameterGrid
 from sklearn.svm import SVC
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import HalvingGridSearchCV
 import sklearn
 sklearn.set_config(transform_output="pandas")  #says pass pandas tables through pipeline instead of numpy matrices
 
