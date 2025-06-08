@@ -18,6 +18,7 @@ from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV
 import datetime
 import sklearn
+import joblib
 sklearn.set_config(transform_output="pandas")  #says pass pandas tables through pipeline instead of numpy matrices
 
 titanic_variance_based_split = 107   #add to your library
