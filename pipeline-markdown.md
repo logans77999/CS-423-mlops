@@ -9,7 +9,7 @@ Used on all categorical data
 - Depression mapped from yes/no to 1/0
 - Diabetes mapped from yes/yes, female told during pregnancy/no, prediabetic/no to 3/2/1/0
 
- ### Tukey/Robust Transformer
+### Tukey/Robust Transformer
  Used on all numeric data
  - Height
  - Weight
